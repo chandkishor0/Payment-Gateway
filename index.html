@@ -139,13 +139,13 @@ let transactionFailed = false;
 // Close main popup and go back
 function closePopup() {
   videoPopup.classList.remove("show");
-  history.back();
-}
 
-// Close failed popup ONLY (no back)
-function closeFailed() {
-  failedPopup.classList.remove("show");
-}
+  // Only go back if there is a previous page in history
+  if (window.history.length > 1) {
+    history.back();
+  }
+  // If no previous page, do nothing
+  }
 
 // Countdown timer
 function startCountdown(seconds) {
