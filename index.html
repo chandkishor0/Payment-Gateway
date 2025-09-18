@@ -23,7 +23,6 @@
     100% {background-position:0% 50%;}
   }
 
-  /* Popup Common */
   .popup {
     display: flex;
     position: fixed; z-index: 999;
@@ -53,7 +52,6 @@
 
   .timer { margin: 12px 0; color: #00ff6a; font-weight: bold; font-size: 16px; }
 
-  /* Plans */
   .plans { display: flex; gap: 12px; margin: 18px 0; justify-content: center; }
   .plan-card {
     flex: 1; background: rgba(255,255,255,0.05);
@@ -81,7 +79,6 @@
   }
   .buy-btn:hover { background: #00ff6a; }
 
-  /* Failed Popup */
   .failed { color: #f87171; font-weight: bold; font-size: 18px; margin-top: 10px; }
 </style>
 </head>
@@ -131,61 +128,60 @@
 </div>
 
 <script>
-  const bookNowBtn = document.getElementById("bookNowBtn");
-  const failedPopup = document.getElementById("failedPopup");
-  const videoPopup = document.getElementById("videoPopup");
-  const countdownEl = document.getElementById("countdown");
+const bookNowBtn = document.getElementById("bookNowBtn");
+const failedPopup = document.getElementById("failedPopup");
+const videoPopup = document.getElementById("videoPopup");
+const countdownEl = document.getElementById("countdown");
 
-  let countdownInterval;
-  let transactionFailed = false; // flag for failed transaction
+let countdownInterval;
+let transactionFailed = false;
 
-  // Close popup and go back
-  function closePopup(){ 
-    videoPopup.classList.remove("show"); 
-    history.back(); 
+// Close main popup and go back
+function closePopup() {
+  videoPopup.classList.remove("show");
+  history.back();
+}
+
+// Close failed popup ONLY (no back)
+function closeFailed() {
+  failedPopup.classList.remove("show");
+}
+
+// Countdown timer
+function startCountdown(seconds) {
+  let remaining = seconds;
+  function update() {
+    let mins = Math.floor(remaining / 60);
+    let secs = remaining % 60;
+    countdownEl.textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+    if (remaining > 0) remaining--;
   }
-  function closeFailed(){ 
-    failedPopup.classList.remove("show"); 
-    history.back(); 
+  update();
+  countdownInterval = setInterval(update, 1000);
+}
+startCountdown(30*60);
+
+// Plan selection logic
+document.querySelectorAll("input[name='plan']").forEach(radio => {
+  radio.addEventListener("change", function() {
+    const price = this.value;
+    bookNowBtn.href = `upi://pay?pa=mushkanbabu@ybl&pn=Mushkan&am=${price}&cu=INR`;
+    bookNowBtn.textContent = `Pay ₹${price}`;
+  });
+});
+
+// Pay button: opens UPI, does not close popup
+bookNowBtn.addEventListener("click", function() {
+  transactionFailed = true; // mark for showing failed popup on return
+});
+
+// Show failed popup only if transactionFailed is true
+window.addEventListener('focus', () => {
+  if (transactionFailed) {
+    failedPopup.classList.add("show");
+    transactionFailed = false;
   }
-
-  // Countdown Timer
-  function startCountdown(seconds) {
-    let remaining = seconds;
-    function update() {
-      let mins = Math.floor(remaining / 60);
-      let secs = remaining % 60;
-      countdownEl.textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-      if(remaining > 0) remaining--;
-    }
-    update();
-    countdownInterval = setInterval(update, 1000);
-  }
-  startCountdown(30*60);
-
-  // Plan selection logic
-  document.querySelectorAll("input[name='plan']").forEach(radio => {
-    radio.addEventListener("change", function() {
-      let price = this.value;
-      let paymentLink = `upi://pay?pa=mushkanbabu@ybl&pn=Mushkan&am=${price}&cu=INR`;
-      bookNowBtn.href = paymentLink;
-      bookNowBtn.textContent = `Pay ₹${price}`;
-    });
-  });
-
-  // Handle Pay click
-  bookNowBtn.addEventListener("click", function() {
-    transactionFailed = true;  // mark for showing failed popup when returning
-    // Do NOT call closePopup here
-  });
-
-  // Show failed popup when user returns to page (simulate failed)
-  window.addEventListener('focus', () => {
-    if(transactionFailed) {
-      failedPopup.classList.add("show");
-      transactionFailed = false;
-    }
-  });
+});
 </script>
 
 </body>
