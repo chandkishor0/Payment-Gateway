@@ -117,7 +117,7 @@
       <code>mushkanbabu@ybl</code>
     </div>
 
-    <a id="bookNowBtn" href="#" class="buy-btn">Pay ₹200</a>
+    <a id="bookNowBtn" href="upi://pay?pa=mushkanbabu@ybl&pn=Mushkan&am=200&cu=INR" class="buy-btn">Pay ₹200</a>
   </div>
 </div>
 
@@ -142,11 +142,11 @@
   // Close popup and go back
   function closePopup(){ 
     videoPopup.classList.remove("show"); 
-    history.back(); // go to previous page
+    history.back(); 
   }
   function closeFailed(){ 
     failedPopup.classList.remove("show"); 
-    history.back(); // go to previous page
+    history.back(); 
   }
 
   // Countdown Timer
@@ -173,14 +173,13 @@
     });
   });
 
-  // Handle "Pay" click (simulate failed transaction)
+  // Handle Pay click
   bookNowBtn.addEventListener("click", function() {
-    transactionFailed = true;  // mark as failed
-    closePopup();               // close video popup
-    // UPI app opens automatically
+    transactionFailed = true;  // mark for showing failed popup when returning
+    // Do NOT call closePopup here
   });
 
-  // Show failed popup when user returns to page
+  // Show failed popup when user returns to page (simulate failed)
   window.addEventListener('focus', () => {
     if(transactionFailed) {
       failedPopup.classList.add("show");
